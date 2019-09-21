@@ -39,6 +39,10 @@ const game = new Schema({
     ref: 'Users',
     required: false,
   },
+  game_life: {
+    type: Number,
+    default: 20,
+  },
 
 });
 

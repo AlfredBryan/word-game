@@ -67,4 +67,13 @@ router
     gameController.joinGame
   );
 
+  // GAMES ASSIGNED TO USER
+  router
+  .route(`${url}/assigned`)
+  .get(
+    authenticate.checkTokenExists,
+    authenticate.checkTokenValid,
+    gameController.getGamesAssigned,
+  );
+
 module.exports = router;

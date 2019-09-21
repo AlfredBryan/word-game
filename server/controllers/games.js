@@ -109,6 +109,37 @@ class game {
       statusCode: 200,
     });
   }
+
+  /**
+   * get all games assigned to use
+   * @param {object} req - api request
+   * @param {object} res - api response
+   * @param {function} next - next middleware function
+   * @return {json}
+   */
+  static async getGamesAssigned(req, res, next) {
+    const token = helper(req);
+
+    // get all games that are assigned to user
+    const games = await Games.find({
+      status: 'Taken',
+      player: token.id,
+    })
+      .populate('user', 'username');
+
+    if (games.length < 1) {
+      const err = new Error();
+      err.message = 'No available game at the moment';
+      err.statusCode = 200;
+      return next(err);
+    }
+
+    return res.status(200).json({
+      message: 'games available',
+      games,
+      statusCode: 200,
+    });
+  }
 }
 
 module.exports = game;
