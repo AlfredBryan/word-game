@@ -1,7 +1,5 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const helper = require('../middleware/helper');
-const Users = require('../models/users.js');
+// const Users = require('../models/users.js');
 const Games = require('../models/games');
 
 class game {
@@ -16,7 +14,8 @@ class game {
     // get all games that are still pending
     const games = await Games.find({
       status: 'pending',
-    }) 
+    })
+      .populate('user', 'username');
 
     if (games.length < 1) {
       const err = new Error();
