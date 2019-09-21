@@ -16,7 +16,7 @@ const users = new Schema({
     unique: true,
     maxlength: 50,
   },
-  
+
   gender: {
     type: String,
     required: true,
@@ -41,6 +41,12 @@ const users = new Schema({
     type: String,
     required: false,
     unique: false,
+  },
+
+  total_score: {
+    type: Number,
+    required: true,
+    default: 0,
   }
 
 });
