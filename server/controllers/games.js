@@ -61,6 +61,54 @@ class game {
       statusCode: 201,
     });
   }
+
+  /**
+   * join pending game
+   * @param {object} req - api request
+   * @param {object} res - api response
+   * @param {function} next - next middleware function
+   * @return {json}
+   */
+  static async joinGame(req, res, next) {
+    const token = helper(req);
+    const { gameId } = req.param;
+    const findGame = await Games.findOne({
+      id: gameId,
+      status: 'pending',
+    });
+
+    if (!findGame) {
+      const err = new Error();
+      err.message = 'Sorry this game is no longer available';
+      err.statusCode = 400;
+      return next(err);
+    }
+
+    //  check if the owner of the game is tring to solve the game himself
+    if (findGame.user == token.id) {
+      const err = new Error();
+      err.message = 'Sorry You cannot solve the game you created';
+      err.statusCode = 400;
+      return next(err);
+    }
+
+    // update game status and assign game to user
+    findGame.status = 'Taken';
+    findGame.player = token.id;
+
+    const assign = await findGame.save();
+    if (!assign) {
+      const err = new Error();
+      err.message = 'Sorry could not assign game to you now. please try again';
+      err.statusCode = 400;
+      return next(err);
+    }
+
+    return res.status(200).json({
+      message: 'This game has been assigned to you',
+      statusCode: 200,
+    });
+  }
 }
 
 module.exports = game;

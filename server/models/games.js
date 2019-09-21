@@ -34,6 +34,12 @@ const game = new Schema({
     default: 'pending',
   },
 
+  player: {
+    type: mongoose.Types.ObjectId,
+    ref: 'Users',
+    required: false,
+  },
+
 });
 
 module.exports = mongoose.model('Games', game);

@@ -45,7 +45,7 @@ router
   );
 
 
-  // CREAT GAME
+  // CREATe GAME
 router
   .route(`${url}/game`)
   .post(
@@ -53,6 +53,18 @@ router
     authenticate.checkTokenValid,
     validator.checkBodyMaxValue(10, 'question'),
     gameController.createGame,
+);
+  
+// Join GAME
+
+// TODO: validate incoming game id
+
+router
+  .route(`${url}/join/:gameId`)
+  .get(
+    authenticate.checkTokenExists,
+    authenticate.checkTokenValid,
+    gameController.joinGame
   );
 
 module.exports = router;
