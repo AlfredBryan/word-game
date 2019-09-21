@@ -85,4 +85,15 @@ router
     gameController.getSingleGamesAssigned,
   );
 
+  // PLAY SINGLE GAME ASSIGNED TO USER
+  router
+  .route(`${url}/play/:gameId`)
+  .post(
+    authenticate.checkTokenExists,
+    authenticate.checkTokenValid,
+    validator.checkBodyContains('answer'),
+    validator.checkBodyNotEmpty('answer'),
+    gameController.playGameAssigned,
+  );
+
 module.exports = router;

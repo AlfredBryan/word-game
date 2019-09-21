@@ -1,7 +1,8 @@
 const helper = require('../middleware/helper');
-// const Users = require('../models/users.js');
+const Users = require('../models/users.js');
 const Games = require('../models/games');
 
+// FIXME: when finding with game id, it returns nothing
 class game {
   /**
    * get all available game
@@ -71,7 +72,7 @@ class game {
    */
   static async joinGame(req, res, next) {
     const token = helper(req);
-    const { gameId } = req.param;
+    const { gameId } = req.params;
     const findGame = await Games.findOne({
       id: gameId,
       status: 'pending',
@@ -151,7 +152,7 @@ class game {
    */
   static async getSingleGamesAssigned(req, res, next) {
     const token = helper(req);
-    const { gameId } = req.param;
+    const { gameId } = req.params;
 
     // get all games that are assigned to user
     const games = await Games.findOne({
@@ -172,6 +173,73 @@ class game {
     return res.status(200).json({
       message: 'game available',
       games,
+      statusCode: 200,
+    });
+  }
+
+  /**
+   * play game
+   * @param {object} req - api request
+   * @param {object} res - api response
+   * @param {function} next - next middleware function
+   * @return {json}
+   */
+  static async playGameAssigned(req, res, next) {
+    const token = helper(req);
+    const { answer } = req.body;
+    const { gameId } = req.params;
+    console.log(gameId)
+
+    // get all games that are assigned to user
+    const games = await Games.findOne({
+      status: 'Taken',
+      player: token.id,
+      id: gameId,
+    });
+
+    console.log(games, gameId);
+    if (!games) {
+      const err = new Error();
+      err.message = 'Sorry!! This game was not assigned to you';
+      err.statusCode = 200;
+      return next(err);
+    }
+
+    if (games.life > 0 && (games.question === answer)) {
+      const user = Users.findOne({
+        id: token.id,
+      });
+
+      user.score += games.score;
+      games.status = 'Won';
+
+      await games.save();
+      await user.save();
+
+      return res.status(200).json({
+        message: 'You Won..',
+        statusCode: 200,
+      });
+    }
+
+    if ((games.life > 0) && (games.question !== answer)) {
+      game.life -= game.life;
+      const result = await games.save();
+
+      return res.status(200).json({
+        message: 'Wrong Answer',
+        life: result.life,
+        statusCode: 200,
+      });
+    }
+
+
+    games.life = 20;
+    games.player = undefined;
+    await games.save();
+
+    return res.status(200).json({
+      message: 'You Lost..',
       statusCode: 200,
     });
   }
