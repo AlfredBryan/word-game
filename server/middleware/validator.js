@@ -141,6 +141,7 @@ class validator {
         // req.body[firstname]
         // e.g Error 'first name is cannot be empty'
         const temp = p.replace(' ', '');
+        console.log(temp);
         if (req.body[temp].length < min) {
           const err = new Error();
           err.message = `minimum length for ${p} is ${min}`;

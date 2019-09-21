@@ -1,10 +1,11 @@
-let dbURL;
-if (process.env.NODE_ENV === 'production') dbURL = '';
+const mongoose = require('mongoose');
+let dbUrl;
+if (process.env.NODE_ENV === 'production') dbUrl = '';
 
-else dbURL = 'mongodb://localhost:27017/word-game';
+else dbUrl = 'mongodb://localhost:27017/word-game';
 
 
-const connect = () {
+const connect = () => {
   mongoose.connect(dbUrl, {
     useNewUrlParser: true,
   })
