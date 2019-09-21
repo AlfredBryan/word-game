@@ -76,4 +76,13 @@ router
     gameController.getGamesAssigned,
   );
 
+  // SINGLE GAME ASSIGNED TO USER
+  router
+  .route(`${url}/assigned/:gameId`)
+  .get(
+    authenticate.checkTokenExists,
+    authenticate.checkTokenValid,
+    gameController.getSingleGamesAssigned,
+  );
+
 module.exports = router;

@@ -125,7 +125,8 @@ class game {
       status: 'Taken',
       player: token.id,
     })
-      .populate('user', 'username');
+      .populate('user', 'username')
+      .populate('player', 'username');
 
     if (games.length < 1) {
       const err = new Error();
@@ -136,6 +137,40 @@ class game {
 
     return res.status(200).json({
       message: 'games available',
+      games,
+      statusCode: 200,
+    });
+  }
+
+  /**
+   * get single game assigned to user
+   * @param {object} req - api request
+   * @param {object} res - api response
+   * @param {function} next - next middleware function
+   * @return {json}
+   */
+  static async getSingleGamesAssigned(req, res, next) {
+    const token = helper(req);
+    const { gameId } = req.param;
+
+    // get all games that are assigned to user
+    const games = await Games.findOne({
+      status: 'Taken',
+      player: token.id,
+      id: gameId,
+    })
+      .populate('user', 'username')
+      .populate('player', 'username');
+
+    if (!games) {
+      const err = new Error();
+      err.message = 'Game does not exist';
+      err.statusCode = 404;
+      return next(err);
+    }
+
+    return res.status(200).json({
+      message: 'game available',
       games,
       statusCode: 200,
     });
