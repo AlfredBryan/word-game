@@ -2,10 +2,10 @@ const router = require('express').Router();
 const validator = require('../middleware/validator');
 const authenticate = require('../middleware/authentication');
 const userController = require('../controllers/user');
+const gameController = require('../controllers/games');
 const url = '/api/v1';
 
-// POST REQUESTS
-
+// REGISTRATION
 router
   .route(`${url}/register`)
   .post(
@@ -25,6 +25,7 @@ router
     userController.createAccount,
   );
 
+// LOGIN
 router
   .route(`${url}/login`)
   .post(
@@ -32,5 +33,26 @@ router
     validator.checkBodyNotEmpty('email', 'password'),
     validator.checkEmailValid,
     userController.loginUser,
+);
+
+// AVAILABLE GAMES
+router
+  .route(`${url}/games`)
+  .get(
+    authenticate.checkTokenExists,
+    authenticate.checkTokenValid,
+    gameController.getGames,
   );
+
+
+  // CREAT GAME
+router
+  .route(`${url}/game`)
+  .post(
+    authenticate.checkTokenExists,
+    authenticate.checkTokenValid,
+    validator.checkBodyMaxValue(10, 'question'),
+    gameController.createGame,
+  );
+
 module.exports = router;
