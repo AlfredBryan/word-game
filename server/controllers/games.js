@@ -74,7 +74,7 @@ class game {
     const token = helper(req);
     const { gameId } = req.params;
     const findGame = await Games.findOne({
-      id: gameId,
+      _id: gameId,
       status: 'pending',
     });
 
@@ -94,11 +94,13 @@ class game {
     }
 
     // update game status and assign game to user
-    findGame.status = 'Taken';
-    findGame.player = token.id;
+    const update = await Games.findByIdAndUpdate({ _id: gameId }, {
+      status: 'Taken',
+      player: token.id,
+    });
+    console.log(update);
 
-    const assign = await findGame.save();
-    if (!assign) {
+    if (!update) {
       const err = new Error();
       err.message = 'Sorry could not assign game to you now. please try again';
       err.statusCode = 400;
@@ -158,7 +160,7 @@ class game {
     const games = await Games.findOne({
       status: 'Taken',
       player: token.id,
-      id: gameId,
+      _id: gameId,
     })
       .populate('user', 'username')
       .populate('player', 'username');
@@ -194,9 +196,9 @@ class game {
     const games = await Games.findOne({
       status: 'Taken',
       player: token.id,
-      id: gameId,
+      _id: gameId,
     });
-
+  
     console.log(games, gameId);
     if (!games) {
       const err = new Error();
@@ -205,16 +207,19 @@ class game {
       return next(err);
     }
 
-    if (games.life > 0 && (games.question === answer)) {
+    if (games.game_life > 0 && (games.question == answer)) {
       const user = Users.findOne({
-        id: token.id,
+        _id: token.id,
       });
+      console.log(user);
 
-      user.score += games.score;
+      user.total_score += games.game_score;
       games.status = 'Won';
 
       await games.save();
-      await user.save();
+      await User.findByIdAndUpdate({ _id: token.id }, {
+        total_score: games.game_score,
+      });
 
       return res.status(200).json({
         message: 'You Won..',
@@ -222,19 +227,20 @@ class game {
       });
     }
 
-    if ((games.life > 0) && (games.question !== answer)) {
-      game.life -= game.life;
+    if ((games.game_life > 0) && (games.question != answer)) {
+      games.game_life --;
       const result = await games.save();
 
       return res.status(200).json({
         message: 'Wrong Answer',
-        life: result.life,
+        life: result.game_life,
         statusCode: 200,
       });
     }
 
 
-    games.life = 20;
+    games.game_life = 20;
+    games.status = 'pending'
     games.player = undefined;
     await games.save();
 
