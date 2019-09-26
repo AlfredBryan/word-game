@@ -33,8 +33,16 @@ router
     validator.checkBodyNotEmpty('email', 'password'),
     validator.checkEmailValid,
     userController.loginUser,
-);
+  );
 
+// USER PROFILE
+router
+  .route(`${url}/profile`)
+  .get(
+    authenticate.checkTokenExists,
+    authenticate.checkTokenValid,
+    userController.getProfile,
+  );
 // AVAILABLE GAMES
 router
   .route(`${url}/games`)
@@ -45,7 +53,7 @@ router
   );
 
 
-  // CREATe GAME
+// CREATe GAME
 router
   .route(`${url}/game`)
   .post(
@@ -53,8 +61,8 @@ router
     authenticate.checkTokenValid,
     validator.checkBodyMaxValue(10, 'question'),
     gameController.createGame,
-);
-  
+  );
+
 // Join GAME
 
 // TODO: validate incoming game id
@@ -64,11 +72,11 @@ router
   .get(
     authenticate.checkTokenExists,
     authenticate.checkTokenValid,
-    gameController.joinGame
+    gameController.joinGame,
   );
 
-  // GAMES ASSIGNED TO USER
-  router
+// GAMES ASSIGNED TO USER
+router
   .route(`${url}/assigned`)
   .get(
     authenticate.checkTokenExists,
@@ -76,8 +84,8 @@ router
     gameController.getGamesAssigned,
   );
 
-  // SINGLE GAME ASSIGNED TO USER
-  router
+// SINGLE GAME ASSIGNED TO USER
+router
   .route(`${url}/assigned/:gameId`)
   .get(
     authenticate.checkTokenExists,
@@ -85,8 +93,8 @@ router
     gameController.getSingleGamesAssigned,
   );
 
-  // PLAY SINGLE GAME ASSIGNED TO USER
-  router
+// PLAY SINGLE GAME ASSIGNED TO USER
+router
   .route(`${url}/play/:gameId`)
   .post(
     authenticate.checkTokenExists,

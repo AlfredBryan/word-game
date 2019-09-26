@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Users = require('../models/users.js');
+const helper = require('../middleware/helper');
 
 class user {
   /**
@@ -87,6 +88,33 @@ class user {
       result,
     });
   }
-}
 
+  /**
+   * get user profile
+   * @param {object} req - api request
+   * @param {object} res - api response
+   * @param {function} next - next middleware function
+   * @return {json}
+   */
+  static async getProfile(req, res, next) {
+    const token = helper(req);
+    const profile = await Users.findOne({
+      _id: token.id,
+    });
+
+    if (!profile) {
+      const err = new Error();
+      err.message = 'User does not exist';
+      err.statusCode = 404;
+      return next(err);
+    }
+    profile.password = undefined;
+
+    return res.status(201).json({
+      message: 'User profile',
+      profile,
+      statusCode: 200,
+    });
+  }
+}
 module.exports = user;
