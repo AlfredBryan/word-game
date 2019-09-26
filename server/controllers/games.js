@@ -15,7 +15,7 @@ class game {
     // get all games that are still pending
     const games = await Games.find({
       status: 'pending',
-    })
+    }, { question: 0 })
       .populate('user', 'username');
 
     if (games.length < 1) {
@@ -98,7 +98,6 @@ class game {
       status: 'Taken',
       player: token.id,
     });
-    console.log(update);
 
     if (!update) {
       const err = new Error();
@@ -127,7 +126,7 @@ class game {
     const games = await Games.find({
       status: 'Taken',
       player: token.id,
-    })
+    }, { question: 0 })
       .populate('user', 'username')
       .populate('player', 'username');
 
@@ -161,7 +160,7 @@ class game {
       status: 'Taken',
       player: token.id,
       _id: gameId,
-    })
+    }, { question: 0 })
       .populate('user', 'username')
       .populate('player', 'username');
 
@@ -190,7 +189,6 @@ class game {
     const token = helper(req);
     const { answer } = req.body;
     const { gameId } = req.params;
-    console.log(gameId)
 
     // get all games that are assigned to user
     const games = await Games.findOne({
@@ -198,8 +196,7 @@ class game {
       player: token.id,
       _id: gameId,
     });
-  
-    console.log(games, gameId);
+
     if (!games) {
       const err = new Error();
       err.message = 'Sorry!! This game was not assigned to you';
@@ -228,7 +225,7 @@ class game {
     }
 
     if ((games.game_life > 0) && (games.question != answer)) {
-      games.game_life --;
+      games.game_life--;
       const result = await games.save();
 
       return res.status(200).json({
@@ -240,7 +237,7 @@ class game {
 
 
     games.game_life = 20;
-    games.status = 'pending'
+    games.status = 'pending';
     games.player = undefined;
     await games.save();
 
