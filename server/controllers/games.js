@@ -210,12 +210,11 @@ class game {
       });
       console.log(user);
 
-      user.total_score += games.game_score;
       games.status = 'Won';
 
       await games.save();
-      await User.findByIdAndUpdate({ _id: token.id }, {
-        total_score: games.game_score,
+      await Users.findByIdAndUpdate({ _id: token.id }, {
+        total_score: games.game_score + user.total_score,
       });
 
       return res.status(200).json({
