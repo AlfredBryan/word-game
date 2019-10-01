@@ -86,7 +86,7 @@ class game {
     }
 
     //  check if the owner of the game is tring to solve the game himself
-    if (findGame.user == token.id) {
+    if (findGame.user === token.id) {
       const err = new Error();
       err.message = 'Sorry You cannot solve the game you created';
       err.statusCode = 400;
@@ -205,16 +205,14 @@ class game {
     }
 
     if (games.game_life > 0 && (games.question == answer)) {
-      const user = Users.findOne({
+      const user = await Users.findOne({
         _id: token.id,
       });
-      console.log(user);
 
       games.status = 'Won';
-
       await games.save();
       await Users.findByIdAndUpdate({ _id: token.id }, {
-        total_score: games.game_score + user.total_score,
+        scores: games.game_score + user.scores,
       });
 
       return res.status(200).json({
