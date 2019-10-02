@@ -44,6 +44,11 @@ const game = new Schema({
     default: 20,
   },
 
+  game_score: {
+    type: Number,
+    default: 10,
+  },
+
 });
 
 module.exports = mongoose.model('Games', game);

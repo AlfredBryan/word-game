@@ -43,7 +43,7 @@ const users = new Schema({
     unique: false,
   },
 
-  total_score: {
+  scores: {
     type: Number,
     required: true,
     default: 0,
